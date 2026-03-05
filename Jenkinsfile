@@ -2,54 +2,45 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "my-app"
-        PORT = "4000"
+        DOCKER_IMAGE = "my-galaxy:latest"
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/your-repo.git', branch: 'main'
+                git 'https://github.com/galaxyproject/galaxy.git'
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                sh 'mvn clean install'
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                sh './run_tests.sh'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "Deploying ${APP_NAME} on port ${PORT}"
-
-                // Example 1: Run a Java Spring Boot app on port 4000
-                // sh "java -jar target/${APP_NAME}.jar --server.port=${PORT} &"
-
-                // Example 2: Run a Node.js app on port 4000
-                // sh "PORT=${PORT} node server.js &"
-
-                // Example 3: Docker deployment exposing port 4000
-                sh """
-                   docker build -t ${APP_NAME}:${env.BUILD_NUMBER} .
-                   docker run -d -p ${PORT}:${PORT} ${APP_NAME}:${env.BUILD_NUMBER}
-                """
+                sh 'docker run -d -p 8080:80 $DOCKER_IMAGE'
             }
         }
     }
 
     post {
+        always {
+            echo 'Pipeline completed'
+        }
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Deployment successful'
         }
         failure {
-            echo 'Pipeline failed.'
+            echo 'Pipeline failed'
         }
     }
 }
