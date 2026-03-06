@@ -27,7 +27,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 8080:80 $DOCKER_IMAGE'
+                sh 'docker run -d -p 4000:80 $DOCKER_IMAGE'
             }
         }
     }
