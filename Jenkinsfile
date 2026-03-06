@@ -2,12 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "my-galaxy:latest"
+        IMAGE_NAME = "vasundhara-app"
+        CONTAINER_NAME = "vasundhara-container"
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
                 git 'https://github.com/Vasu-dhara-12/vasundhara-Reddy.git'
             }
@@ -15,29 +16,31 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                echo "Building Docker Image..."
-                docker build -t $DOCKER_IMAGE .
-                '''
+                script {
+                    sh "docker build -t $IMAGE_NAME ."
+                }
             }
         }
 
-        stage('Deploy') {
+        stage('Run Docker Container') {
             steps {
-                sh 'docker run -d -p 4000:80 $DOCKER_IMAGE'
+                script {
+                    sh """
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
+                    docker run -d -p 4000:80 --name $CONTAINER_NAME $IMAGE_NAME
+                    """
+                }
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline completed'
-        }
         success {
-            echo 'Deployment successful'
+            echo 'Pipeline executed successfully!'
         }
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline failed!'
         }
     }
 }
