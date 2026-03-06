@@ -5,6 +5,7 @@ pipeline {
         IMAGE_NAME = "vasundhara-nginx-app"
         CONTAINER_NAME = "vasundhara-nginx-container"
         PORT = "4000"
+        CONTAINER_PORT = "80"
     }
 
     stages {
@@ -23,7 +24,7 @@ pipeline {
                 sh "docker rm $CONTAINER_NAME || true"
 
                 echo "Running new container on port $PORT..."
-                sh "docker run -d -p $PORT:$PORT --name $CONTAINER_NAME $IMAGE_NAME"
+                sh "docker run -d -p $PORT:$CONTAINER_PORT --name $CONTAINER_NAME $IMAGE_NAME"
             }
         }
     }
