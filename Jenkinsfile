@@ -2,45 +2,38 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "vasundhara-app"
-        CONTAINER_NAME = "vasundhara-container"
+        IMAGE_NAME = "vasundhara-nginx-app"
+        CONTAINER_NAME = "vasundhara-nginx-container"
+        PORT = "4000"
     }
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/Vasu-dhara-12/vasundhara-Reddy.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t $IMAGE_NAME ."
-                }
+                echo "Building Docker image..."
+                sh "docker build -t $IMAGE_NAME ."
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                script {
-                    sh """
-                    docker stop $CONTAINER_NAME || true
-                    docker rm $CONTAINER_NAME || true
-                    docker run -d -p 4000:80 --name $CONTAINER_NAME $IMAGE_NAME
-                    """
-                }
+                echo "Stopping existing container if any..."
+                sh "docker stop $CONTAINER_NAME || true"
+                sh "docker rm $CONTAINER_NAME || true"
+
+                echo "Running new container on port $PORT..."
+                sh "docker run -d -p $PORT:$PORT --name $CONTAINER_NAME $IMAGE_NAME"
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline executed successfully!'
+            echo "Pipeline executed successfully! Website is live on port $PORT."
         }
         failure {
-            echo 'Pipeline failed!'
+            echo "Pipeline failed. Check logs for errors."
         }
     }
 }
