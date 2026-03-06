@@ -9,22 +9,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/galaxyproject/galaxy.git'
-            }
-        }
-
-        stage('Create Dockerfile') {
-            steps {
-                sh '''
-                echo "Creating Dockerfile..."
-
-                cat <<EOF > Dockerfile
-                FROM nginx
-                COPY . /usr/share/nginx/html
-                EXPOSE 80
-                CMD ["nginx","-g","daemon off;"]
-                EOF
-                '''
+                git 'https://github.com/Vasu-dhara-12/vasundhara-Reddy.git'
             }
         }
 
